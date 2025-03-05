@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "install": "npm install express axios cors dotnev",
+        "start": "node server.js"
+    }
+}
