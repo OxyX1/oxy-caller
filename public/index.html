@@ -1,46 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generate Image</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Calling App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Generate Image</h1>
-  <form id="imageForm">
-    <label for="prompt">Enter prompt:</label>
-    <input type="text" id="prompt" name="prompt" required>
-    <button type="submit">Generate</button>
-  </form>
-  <h2>Generated Image</h2>
-  <img id="generatedImage" alt="Generated Image" />
+    <div class="container">
+        <h1>WebRTC Calling App</h1>
 
-  <script>
-    document.getElementById('imageForm').addEventListener('submit', async (event) => {
-      event.preventDefault();
+        <div id="call-section">
+            <label for="code">Enter 4-digit Call ID:</label>
+            <input type="text" id="code" maxlength="4" placeholder="Enter code">
+            <button id="start-call" onclick="startCall()">Start Call</button>
+            <button id="end-call" onclick="endCall()" disabled>End Call</button>
+        </div>
 
-      const prompt = document.getElementById('prompt').value;
+        <div id="status">
+            <p id="status-message">Ready to call!</p>
+        </div>
 
-      try {
-        const response = await fetch('/generate-image', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt: prompt }),
-        });
+        <div id="video-container">
+            <video id="local-video" autoplay muted></video>
+            <video id="remote-video" autoplay></video>
+        </div>
+    </div>
 
-        if (response.ok) {
-          console.log('✅ Image generation request sent successfully');
-          document.getElementById('generatedImage').src = '/image';
-        } else {
-          const error = await response.json();
-          console.error('Error generating image:', error);
-        }
-      } catch (error) {
-        console.error('Network error:', error);
-      }
-    });
-  </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
