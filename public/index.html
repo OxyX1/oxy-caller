@@ -18,23 +18,30 @@
   <script>
     document.getElementById('imageForm').addEventListener('submit', async (event) => {
       event.preventDefault();
-
+  
       const prompt = document.getElementById('prompt').value;
-
-      const response = await fetch('/generate-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: prompt }),
-      });
-
-      if (response.ok) {
-        document.getElementById('generatedImage').src = '/image';
-      } else {
-        console.error('Error generating image:', response.statusText);
+  
+      try {
+        const response = await fetch('/generate-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: prompt }),
+        });
+  
+        if (response.ok) {
+          console.log('✅ Image generation request sent successfully');
+          document.getElementById('generatedImage').src = '/image';
+        } else {
+          const error = await response.json();
+          console.error('Error generating image:', error);
+        }
+      } catch (error) {
+        console.error('Network error:', error);
       }
     });
   </script>
+  
 </body>
 </html>

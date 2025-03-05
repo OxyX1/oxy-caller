@@ -10,9 +10,16 @@ const port = 3000;
 app.use(express.static('public'));
 app.use(express.json());
 
+// Log each request to the server
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}`);
+  next();
+});
+
 // Endpoint to generate image based on user input
 app.post('/generate-image', async (req, res) => {
   const { prompt } = req.body;
+  console.log(`Generating image for prompt: ${prompt}`);
   const payload = {
     prompt: prompt,
     output_format: 'webp',
@@ -26,7 +33,7 @@ app.post('/generate-image', async (req, res) => {
         validateStatus: undefined,
         responseType: 'arraybuffer',
         headers: {
-          Authorization: `Bearer sk-8TZjFXoWC0lgREyuaAZokT1oVDeVmvCbcYWWsf1G14XzgFr2`,
+          Authorization: `Bearer YOUR_API_KEY`,
           Accept: 'image/*',
         },
       }
