@@ -36,7 +36,7 @@ app.post("/generate", async (req, res) => {
 
         res.json({ imageUrl: response.data.data[0].url });
     } catch (error) {
-        console.error("Error generating image:", error.message);
+        console.error("Error details:", error.response ? error.response.data : error.message);
         res.status(500).json({ error: "Image generation failed." });
     }
 });
