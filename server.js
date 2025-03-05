@@ -20,11 +20,23 @@ app.post("/generate", async (req, res) => {
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ error: "Prompt is required" });
 
+    const API_URL = process.env.API_URL || "https://api.openai.com/v1/images/generations"; // Use correct URL
+    const API_KEY = process.env.OPENAI_API_KEY; // Load API Key from .env
+
+    if (!API_KEY) {
+        return res.status(500).json({ error: "Missing OpenAI API Key" });
+    }
+
     try {
-        const response = await axios.post("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", { prompt });
-        res.json({ imageUrl: response.data.imageUrl });
+        const response = await axios.post(
+            API_URL,
+            { prompt },
+            { headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" } }
+        );
+
+        res.json({ imageUrl: response.data.data[0].url });
     } catch (error) {
-        console.error("Error generating image:", error);
+        console.error("Error generating image:", error.message);
         res.status(500).json({ error: "Image generation failed." });
     }
 });
