@@ -12,7 +12,8 @@ const iceServers = {
 
 const localVideo = document.getElementById('local-video');
 const remoteVideo = document.getElementById('remote-video');
-const startButton = document.getElementById('start-call');
+const createButton = document.getElementById('create-call');
+const joinButton = document.getElementById('join-call');
 const endButton = document.getElementById('end-call');
 const statusMessage = document.getElementById('status-message');
 const codeInput = document.getElementById('code');
@@ -20,7 +21,8 @@ const codeInput = document.getElementById('code');
 let callInProgress = false;
 let callId = null;
 
-startButton.disabled = false;
+createButton.disabled = false;
+joinButton.disabled = false;
 endButton.disabled = true;
 
 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -30,39 +32,23 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     })
     .catch(err => console.error('Error accessing media devices.', err));
 
-function startCall() {
+function createCall() {
+    socket.emit('create-call');
+    statusMessage.textContent = 'Creating call...';
+
+    createButton.disabled = true;
+    joinButton.disabled = true;
+    endButton.disabled = false;
+}
+
+function joinCall() {
     const code = codeInput.value.trim();
     if (code.length === 4) {
-        statusMessage.textContent = `Calling... (Code: ${code})`;
-        startButton.disabled = true;
+        socket.emit('join-call', code);
+        statusMessage.textContent = `Joining call with ID: ${code}`;
+        createButton.disabled = true;
+        joinButton.disabled = true;
         endButton.disabled = false;
-
-        callId = code;
-
-        peerConnection = new RTCPeerConnection(iceServers);
-
-        // Add local stream to peer connection
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-        peerConnection.ontrack = (event) => {
-            remoteStream = event.streams[0];
-            remoteVideo.srcObject = remoteStream;
-        };
-
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit('candidate', event.candidate, callId);
-            }
-        };
-
-        peerConnection.createOffer()
-            .then(offer => {
-                return peerConnection.setLocalDescription(offer);
-            })
-            .then(() => {
-                socket.emit('offer', peerConnection.localDescription, callId);
-            })
-            .catch(err => console.error('Error during offer creation:', err));
     } else {
         alert('Please enter a valid 4-digit code.');
     }
@@ -70,7 +56,8 @@ function startCall() {
 
 function endCall() {
     statusMessage.textContent = 'Call ended!';
-    startButton.disabled = false;
+    createButton.disabled = false;
+    joinButton.disabled = false;
     endButton.disabled = true;
 
     peerConnection.close();
@@ -81,6 +68,24 @@ function endCall() {
     remoteStream = null;
     remoteVideo.srcObject = null;
 }
+
+socket.on('call-created', (generatedCallId) => {
+    callId = generatedCallId;
+    statusMessage.textContent = `Call created! Use code: ${callId}`;
+    codeInput.value = callId;
+});
+
+socket.on('joined-call', (joinedCallId) => {
+    statusMessage.textContent = `Joined call with ID: ${joinedCallId}`;
+});
+
+socket.on('call-not-found', () => {
+    alert('Call ID not found. Please check the code.');
+});
+
+socket.on('user-joined', (joinerId) => {
+    statusMessage.textContent = 'A user has joined the call!';
+});
 
 socket.on('offer', (offer, from) => {
     if (!peerConnection) {
