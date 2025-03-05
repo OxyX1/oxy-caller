@@ -26,26 +26,35 @@ app.post('/generate-image', async (req, res) => {
         validateStatus: undefined,
         responseType: 'arraybuffer',
         headers: {
-          Authorization: `Bearer YOUR_API_KEY`,
+          Authorization: `Bearer sk-8TZjFXoWC0lgREyuaAZokT1oVDeVmvCbcYWWsf1G14XzgFr2`,
           Accept: 'image/*',
         },
       }
     );
 
     if (response.status === 200) {
-      fs.writeFileSync('./public/generated_image.webp', Buffer.from(response.data));
+      const imagePath = './public/generated_image.webp';
+      fs.writeFileSync(imagePath, Buffer.from(response.data));
+      console.log(`✅ Image saved as ${imagePath}`);
       res.status(200).json({ message: 'Image generated successfully' });
     } else {
+      console.error(`API Error: ${response.status} - ${response.data.toString()}`);
       res.status(response.status).json({ error: response.data.toString() });
     }
   } catch (error) {
+    console.error(`Catch Error: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Serve the generated image
 app.get('/image', (req, res) => {
-  res.sendFile(path.resolve('public/generated_image.webp'));
+  const imagePath = path.resolve('public/generated_image.webp');
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(imagePath);
+  } else {
+    res.status(404).send('Image not found');
+  }
 });
 
 app.get('/', (req, res) => {
