@@ -15,7 +15,7 @@ app.set('views', path.join(__dirname, 'views')); // Set views directory
 app.use(express.static(path.join(__dirname, 'public'))); // Ensure static files are also resolved
 
 app.get('/', (req, res) => {
-    res.redirect(`/${uuidv4()}`);
+    res.sendFile(path.join(__dirname, 'views', 'room.ejs'));
 });
 
 app.get('/:room', (req, res) => {
