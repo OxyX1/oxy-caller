@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        input, button { margin: 10px; padding: 10px; }
+        img { margin-top: 20px; width: 50%; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>AI Image Generator</h1>
+    <input type="text" id="prompt" placeholder="Enter an image prompt..." />
+    <button onclick="generateImage()">Generate</button>
+    <br>
+    <img id="outputImage" style="display:none;">
+
+    <script>
+        async function generateImage() {
+            const prompt = document.getElementById("prompt").value;
+            const response = await fetch("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+            });
+
+            const data = await response.json();
+            if (data.imageUrl) {
+                document.getElementById("outputImage").src = data.imageUrl;
+                document.getElementById("outputImage").style.display = "block";
+            } else {
+                alert("Error generating image");
+            }
+        }
+    </script>
+</body>
+</html>
