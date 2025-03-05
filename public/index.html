@@ -18,9 +18,9 @@
   <script>
     document.getElementById('imageForm').addEventListener('submit', async (event) => {
       event.preventDefault();
-  
+
       const prompt = document.getElementById('prompt').value;
-  
+
       try {
         const response = await fetch('/generate-image', {
           method: 'POST',
@@ -29,7 +29,7 @@
           },
           body: JSON.stringify({ prompt: prompt }),
         });
-  
+
         if (response.ok) {
           console.log('✅ Image generation request sent successfully');
           document.getElementById('generatedImage').src = '/image';
@@ -42,6 +42,5 @@
       }
     });
   </script>
-  
 </body>
 </html>
