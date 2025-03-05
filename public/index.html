@@ -3,10 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lighthouse Image</title>
+  <title>Generate Image</title>
 </head>
 <body>
-  <h1>Lighthouse Image</h1>
-  <img src="/image" alt="Lighthouse on a cliff" />
+  <h1>Generate Image</h1>
+  <form id="imageForm">
+    <label for="prompt">Enter prompt:</label>
+    <input type="text" id="prompt" name="prompt" required>
+    <button type="submit">Generate</button>
+  </form>
+  <h2>Generated Image</h2>
+  <img id="generatedImage" alt="Generated Image" />
+
+  <script>
+    document.getElementById('imageForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const prompt = document.getElementById('prompt').value;
+
+      const response = await fetch('/generate-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: prompt }),
+      });
+
+      if (response.ok) {
+        document.getElementById('generatedImage').src = '/image';
+      } else {
+        console.error('Error generating image:', response.statusText);
+      }
+    });
+  </script>
 </body>
 </html>
