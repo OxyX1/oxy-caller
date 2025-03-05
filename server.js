@@ -33,7 +33,7 @@ app.post('/generate-image', async (req, res) => {
         validateStatus: undefined,
         responseType: 'arraybuffer',
         headers: {
-          Authorization: `Bearer YOUR_API_KEY`,
+          Authorization: `Bearer sk-8TZjFXoWC0lgREyuaAZokT1oVDeVmvCbcYWWsf1G14XzgFr2`,
           Accept: 'image/*',
         },
       }
