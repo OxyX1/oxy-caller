@@ -21,7 +21,7 @@ app.post("/generate", async (req, res) => {
     if (!prompt) return res.status(400).json({ error: "Prompt is required" });
 
     try {
-        const response = await axios.post("YOUR_AI_API_URL", { prompt });
+        const response = await axios.post("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", { prompt });
         res.json({ imageUrl: response.data.imageUrl });
     } catch (error) {
         console.error("Error generating image:", error);
