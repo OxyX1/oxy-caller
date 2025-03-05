@@ -6,32 +6,30 @@
     <title>AI Image Generator</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        input, button { margin: 10px; padding: 10px; }
-        img { margin-top: 20px; width: 50%; border-radius: 10px; }
+        input, button { margin: 10px; padding: 10px; font-size: 16px; }
+        img { margin-top: 20px; max-width: 100%; }
     </style>
 </head>
 <body>
-    <h1>AI Image Generator</h1>
-    <input type="text" id="prompt" placeholder="Enter an image prompt..." />
+    <h1>Offline AI Image Generator</h1>
+    <input type="text" id="prompt" placeholder="Enter your prompt..." />
     <button onclick="generateImage()">Generate</button>
-    <br>
-    <img id="outputImage" style="display:none;">
+    <div id="output"></div>
 
     <script>
         async function generateImage() {
             const prompt = document.getElementById("prompt").value;
-            const response = await fetch("/generate", {
+            const response = await fetch("http://localhost:3000/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt })
             });
 
             const data = await response.json();
-            if (data.imageUrl) {
-                document.getElementById("outputImage").src = data.imageUrl;
-                document.getElementById("outputImage").style.display = "block";
+            if (data.image) {
+                document.getElementById("output").innerHTML = `<img src="data:image/png;base64,${data.image}" />`;
             } else {
-                alert("Error generating image");
+                alert("Error generating image!");
             }
         }
     </script>

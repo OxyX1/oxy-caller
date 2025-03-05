@@ -1,6 +1,0 @@
-{
-    "scripts": {
-        "install": "npm install express axios cors dotenv",
-        "start": "node server.js"
-    }
-}
