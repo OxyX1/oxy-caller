@@ -1,6 +1,7 @@
 const express = require('express');
 const socketIo = require('socket.io');
 const http = require('http');
+const crypto = require('crypto'); // Used to generate a random room ID
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -13,41 +14,43 @@ app.set('view engine', 'ejs');
 
 // Render the main page
 app.get('/', (req, res) => {
-    res.render('index');  // Serve the call page
+    res.render('index');
+});
+
+// Route to create a new room ID
+app.get('/create-room', (req, res) => {
+    const roomId = crypto.randomBytes(4).toString('hex'); // Generate a random 8-character room ID
+    res.json({ roomId }); // Send the room ID back as JSON
 });
 
 // WebSocket for signaling in WebRTC
 io.on('connection', socket => {
     console.log('a user connected');
 
-    // Handle user joining a room (for video calls)
     socket.on('join-room', (roomId, userId) => {
         socket.join(roomId);
-        socket.to(roomId).emit('user-connected', userId); // Notify others about new connection
+        socket.to(roomId).emit('user-connected', userId);
     });
 
-    // Handle receiving an offer
     socket.on('offer', (offer, roomId) => {
         socket.to(roomId).emit('offer', offer);
     });
 
-    // Handle receiving an answer
     socket.on('answer', (answer, roomId) => {
         socket.to(roomId).emit('answer', answer);
     });
 
-    // Handle receiving ICE candidates
     socket.on('ice-candidate', (candidate, roomId) => {
         socket.to(roomId).emit('ice-candidate', candidate);
     });
 
-    // Handle disconnects
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
 });
 
+// Start the server
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
-    console.log('Server is running on http://localhost:3000');
+    console.log(`Server running on port ${port}`);
 });

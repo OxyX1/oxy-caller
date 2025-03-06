@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebRTC Video Call</title>
+    <style>
+        #room-id-display {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>WebRTC Video Call</h1>
+
+    <!-- Room creation section -->
+    <button id="create-room">Create Room</button>
+    <div id="room-id-display"></div> <!-- Display room ID here -->
     
     <div>
-        <label for="room-id">Room ID:</label>
+        <label for="room-id">Enter Room ID:</label>
         <input type="text" id="room-id" placeholder="Enter Room ID" />
         <button id="join-room">Join Room</button>
     </div>
@@ -25,6 +34,8 @@
         let peerConnection;
         const roomIdInput = document.getElementById('room-id');
         const joinButton = document.getElementById('join-room');
+        const createRoomButton = document.getElementById('create-room');
+        const roomIdDisplay = document.getElementById('room-id-display');
         const localVideo = document.getElementById('local-video');
         const remoteVideo = document.getElementById('remote-video');
 
@@ -88,6 +99,15 @@
             const roomId = roomIdInput.value;
             socket.emit('join-room', roomId, socket.id);
             startCall();
+        });
+
+        // Handle room creation
+        createRoomButton.addEventListener('click', async () => {
+            const response = await fetch('/create-room');
+            const data = await response.json();
+            const newRoomId = data.roomId;
+            roomIdInput.value = newRoomId; // Auto-fill the room ID input
+            roomIdDisplay.innerHTML = `Room ID: ${newRoomId}`; // Display the room ID
         });
     </script>
 </body>
