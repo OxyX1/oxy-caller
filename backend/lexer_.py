@@ -8,6 +8,7 @@ TOKEN_PATTERNS_ = [
     ("HASH_EXEC", r"#\w+"),  # Function execution calls
     ("NUMBER", r"\d+"),  # Numbers
     ("STRING", r"\".*?\""),  # String literals
+    ("BOOL", r"\b(?:true|false)\b"),  # Boolean values
     ("EQUALS", r"="),  # Assignment operator
     ("SEMICOLON", r";"),  # End of statement
     ("LBRACE", r"\{"),  # Opening brace

@@ -1,8 +1,0 @@
-user_input = input("Enter your input: ");
-
-print("hello, world!");
-
-func main() {
-    print("hello, world!");
-}
-

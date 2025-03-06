@@ -49,6 +49,8 @@ class Interpreter_:
                 return str(value).strip('"')  # Ensure value is a string, then strip the quotes
             elif token_type == "NUMBER":
                 return int(value)
+            elif token_type == "BOOL":
+                return value == bool(value)
             elif token_type == "IDENTIFIER":
                 return self.variables_.get(value, value)
             elif token_type == "GLOBAL":
