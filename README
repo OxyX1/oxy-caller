@@ -2,4 +2,11 @@ this is a programming language I developed.
 
 This programming language in made in python. Future updates of this programming software will be using rust. My reasoning is that this language was meant for network configuring and building, system management, and web applications.
 
-you are free to create your own language out of this as this software is completly free.
+** you are free to create your own language out of this as this software is completly free. **
+
+# future updates
+** you will be able to install a official terminal that will run this instead of having to import a backend folder that contains the actual source. **
+** more functions like importing modules will be added to this software **
+** packet sender functions by default; this means that you dont have to import any modules to send packets to networks **
+
+please note that im a student in highschool that is tinkering with technology and only have so much knoledge. I am lack of resources at the moment so there will be slow updates.
