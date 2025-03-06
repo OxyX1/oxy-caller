@@ -2,6 +2,7 @@ import re
 
 TOKEN_PATTERNS_ = [
     ("FUNC", r"\bfunc\b"),  # Function keyword
+    ("READ", r"\bread\b"),  # Read function
     ("IDENTIFIER", r"[a-zA-Z_][a-zA-Z0-9_]*"),  # Variable & function names
     ("GLOBAL", r"@\w+"),  # Global variables
     ("HASH_EXEC", r"#\w+"),  # Function execution calls

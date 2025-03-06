@@ -17,6 +17,16 @@ class Interpreter_:
                 values = command[1]
                 output = self.evaluate_expression(values)
                 print(output)  # Print the evaluated expression
+            elif command[0] == "read":
+                # Read input
+                prompt = "".join([self.evaluate_expression([token]) for token in command[1]])
+                user_input = input(prompt)
+                self.variables_['user_input'] = user_input
+            elif command[0] == "assign_read":
+                # Assign read input to a variable
+                prompt = "".join([self.evaluate_expression([token]) for token in command[2]])
+                user_input = input(prompt)
+                self.variables_[command[1]] = user_input
             elif command[0] == "func_def":
                 self.functions_[command[1]] = command[2]  # Store function body
             elif command[0] == "func_exec":
@@ -48,6 +58,8 @@ class Interpreter_:
             operator = expr[1][1]
             right = self.evaluate_expression([expr[2]])
             if operator == "+":
+                if isinstance(left, str) or isinstance(right, str):
+                    return str(left) + str(right)
                 return left + right
             elif operator == "-":
                 return left - right

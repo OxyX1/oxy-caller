@@ -21,25 +21,34 @@ class Parser_:
                 self.consume("SEMICOLON")  # Skip ';'
                 continue  # Add this line to continue parsing
 
-            elif token_type == "FUNC":
+            elif token_type == "IDENTIFIER" and value == "read":
                 self.pos += 1
-                func_name = self.tokens[self.pos][1]
-                self.consume("IDENTIFIER")
-                self.consume("LPAREN")
-                self.consume("RPAREN")
-                self.consume("LBRACE")
-                func_body = self.parse_()  # Parse until the corresponding '}'
-                self.consume("RBRACE")
-                parsed_code.append(("func_def", func_name, func_body))
+                self.consume("LPAREN")  # Skip '('
+                prompt_expr = self.parse_expression(end_token="RPAREN")
+                self.consume("RPAREN")  # Skip ')'
+                self.consume("SEMICOLON")  # Skip ';'
+                parsed_code.append(("read", prompt_expr))
+                continue
 
             elif token_type == "IDENTIFIER":
-                # Variable assignment (e.g. x = 10; )
+                # Variable assignment (e.g. x = 10; or user_input = read("user: ");)
                 var_name = value
                 self.consume("IDENTIFIER")
-                self.consume("EQUALS")
-                expr = self.parse_expression()  # Parse until SEMICOLON
-                parsed_code.append(("assign", var_name, expr))
-                self.consume("SEMICOLON")
+                if self.tokens[self.pos][0] == "EQUALS":
+                    self.consume("EQUALS")
+                    if self.tokens[self.pos][0] == "READ":
+                        self.consume("READ")
+                        self.consume("LPAREN")
+                        prompt_expr = self.parse_expression(end_token="RPAREN")
+                        self.consume("RPAREN")
+                        self.consume("SEMICOLON")
+                        parsed_code.append(("assign_read", var_name, prompt_expr))
+                    else:
+                        expr = self.parse_expression()  # Parse until SEMICOLON
+                        parsed_code.append(("assign", var_name, expr))
+                        self.consume("SEMICOLON")
+                else:
+                    raise SyntaxError(f"Expected EQUALS, got {self.tokens[self.pos][0]}")
 
             elif token_type == "GLOBAL":
                 # Global variable assignment (e.g. @result = x + y; )
@@ -62,6 +71,20 @@ class Parser_:
                 self.consume("RPAREN")
                 self.consume("SEMICOLON")
                 parsed_code.append(("func_exec", func_exec_name, arg_expr))
+
+            elif token_type == "FUNC":
+                # Function definition (e.g. func main() { ... })
+                self.pos += 1
+                func_name = self.tokens[self.pos][1]
+                self.consume("IDENTIFIER")
+                self.consume("LPAREN")
+                self.consume("RPAREN")
+                self.consume("LBRACE")
+                func_body = self.parse_()  # Recursively parse the function body
+                parsed_code.append(("func_def", func_name, func_body))
+                self.consume("RBRACE")
+                continue
+
             else:
                 # Skip any tokens that don't match our rules
                 self.pos += 1

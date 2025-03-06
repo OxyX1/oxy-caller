@@ -1,8 +1,4 @@
-x = 5;
-y = 10;
+user_input = input("nigger games.io: ");
 
-func main() {
-    print(x / y);
-}
+print("hello, world!");
 
-#main();
