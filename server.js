@@ -1,38 +1,53 @@
 const express = require('express');
-const http = require('http');
 const socketIo = require('socket.io');
-const { v4: uuidv4 } = require('uuid');
-const path = require('path');
-
+const http = require('http');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const port = 3000;
+// Serve static files (e.g., JavaScript for the frontend)
+app.use(express.static('public'));
 
+// Set EJS as the view engine
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // Set views directory
-app.use(express.static(path.join(__dirname, 'public'))); // Ensure static files are also resolved
 
+// Render the main page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'room.ejs'));
+    res.render('index');  // Serve the call page
 });
 
-app.get('/:room', (req, res) => {
-    res.render('room', { roomId: req.params.room });
-});
+// WebSocket for signaling in WebRTC
+io.on('connection', socket => {
+    console.log('a user connected');
 
-io.on('connection', (socket) => {
+    // Handle user joining a room (for video calls)
     socket.on('join-room', (roomId, userId) => {
         socket.join(roomId);
-        socket.to(roomId).emit('user-connected', userId);
+        socket.to(roomId).emit('user-connected', userId); // Notify others about new connection
+    });
 
-        socket.on('disconnect', () => {
-            socket.to(roomId).emit('user-disconnected', userId);
-        });
+    // Handle receiving an offer
+    socket.on('offer', (offer, roomId) => {
+        socket.to(roomId).emit('offer', offer);
+    });
+
+    // Handle receiving an answer
+    socket.on('answer', (answer, roomId) => {
+        socket.to(roomId).emit('answer', answer);
+    });
+
+    // Handle receiving ICE candidates
+    socket.on('ice-candidate', (candidate, roomId) => {
+        socket.to(roomId).emit('ice-candidate', candidate);
+    });
+
+    // Handle disconnects
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
     });
 });
 
-server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+// Start the server
+server.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
 });
