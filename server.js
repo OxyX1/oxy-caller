@@ -26,10 +26,11 @@ app.get('/create-room', (req, res) => {
 // WebSocket for signaling in WebRTC
 io.on('connection', socket => {
     console.log('a user connected');
-
-    socket.on('join-room', (roomId, userId) => {
+    
+    socket.on('join-room', (roomId, userId, username) => {
         socket.join(roomId);
-        socket.to(roomId).emit('user-connected', userId);
+        console.log(`${username} with user ID ${userId} joined room ${roomId}`);
+        socket.to(roomId).emit('user-connected', { userId, username });
     });
 
     socket.on('offer', (offer, roomId) => {

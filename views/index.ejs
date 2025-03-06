@@ -8,11 +8,21 @@
         #room-id-display {
             margin-top: 10px;
         }
+        video {
+            width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <h1>WebRTC Video Call</h1>
 
+    <!-- User section -->
+    <div>
+        <label for="username">Enter Your Username:</label>
+        <input type="text" id="username" placeholder="Enter Username" />
+    </div>
+    
     <!-- Room creation section -->
     <button id="create-room">Create Room</button>
     <div id="room-id-display"></div> <!-- Display room ID here -->
@@ -23,8 +33,11 @@
         <button id="join-room">Join Room</button>
     </div>
 
-    <video id="local-video" autoplay muted></video>
-    <video id="remote-video" autoplay></video>
+    <h2>Your Video</h2>
+    <video id="local-video" autoplay muted></video> <!-- Local video stream -->
+
+    <h2>Remote Video</h2>
+    <video id="remote-video" autoplay></video> <!-- Remote video stream -->
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -38,6 +51,8 @@
         const roomIdDisplay = document.getElementById('room-id-display');
         const localVideo = document.getElementById('local-video');
         const remoteVideo = document.getElementById('remote-video');
+        const usernameInput = document.getElementById('username');
+        let username = '';
 
         const configuration = {
             iceServers: [
@@ -48,6 +63,7 @@
         // Start the video call
         async function startCall() {
             try {
+                // Get both video and audio streams
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 localVideo.srcObject = localStream;
 
@@ -96,8 +112,13 @@
 
         // Join the room when the button is clicked
         joinButton.addEventListener('click', () => {
+            username = usernameInput.value.trim(); // Set the username
+            if (!username) {
+                alert("Please enter a username");
+                return;
+            }
             const roomId = roomIdInput.value;
-            socket.emit('join-room', roomId, socket.id);
+            socket.emit('join-room', roomId, socket.id, username); // Send username to server
             startCall();
         });
 
